@@ -48,7 +48,7 @@ public class SetterSpec {
                 .addJavadoc(field.javadoc)
                 .addParameter(field.type, field.name)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .addStatement("this.$N = $N", field.name);
+                .addStatement("this.$N = $N", field.name, field.name);
         if (returnObject != null) {
             builder.returns(returnObject.type)
                     .addStatement("return $N", returnObject.name);

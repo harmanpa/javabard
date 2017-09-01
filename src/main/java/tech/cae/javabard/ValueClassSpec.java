@@ -18,6 +18,7 @@ package tech.cae.javabard;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.TypeSpec;
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -49,21 +50,36 @@ public class ValueClassSpec {
      * @return
      */
     static Class<?> guessClass(String className) {
-        List<String> packages = Arrays.asList("", "java.lang.", "java.util.");
+        int dim = 0;
+        while (className.charAt(className.length() - 1) == ']') {
+            className = className.substring(0, className.length() - 2);
+            dim++;
+        }
+        Class<?> baseClass = null;
+        List<String> packages = Arrays.asList("", "java.lang.", "java.util.", "java.io.");
         for (String pkg : packages) {
             try {
-                return Class.forName(pkg + className);
+                baseClass = Class.forName(pkg + className);
+                break;
             } catch (ClassNotFoundException ex) {
             }
         }
         // Handle primitives
-        if (className.indexOf('.') < 0 && Character.isLowerCase(className.charAt(0))) {
+        if (baseClass == null && className.indexOf('.') < 0 && Character.isLowerCase(className.charAt(0))) {
             if ("char".equals(className)) {
-                return guessClass("Character");
+                baseClass = guessClass("Character");
+            } else {
+                baseClass = guessClass(new String(new char[]{Character.toUpperCase(className.charAt(0))}) + className.substring(1));
             }
-            return guessClass(new String(new char[]{Character.toUpperCase(className.charAt(0))}) + className.substring(1));
         }
-        return null;
+        if (baseClass == null) {
+            return null;
+        }
+        while (dim > 0) {
+            baseClass = Array.newInstance(baseClass, 1).getClass();
+            dim--;
+        }
+        return baseClass;
     }
 
     public static class Builder {
