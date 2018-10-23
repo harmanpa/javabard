@@ -43,19 +43,19 @@ public class GetterSpec {
      */
     public static MethodSpec.Builder forField(FieldSpec field, String namingConvention) {
         return MethodSpec.methodBuilder(makeName(namingConvention, field.name))
-                .addJavadoc(field.javadoc)
+                .addJavadoc("Get " + field.javadoc + "\n@return " + field.javadoc + "\n")
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .returns(field.type)
                 .addStatement("return this.$N", field.name);
     }
-    
+
     private static String makeName(String namingConvention, String name) {
-        if(namingConvention.indexOf("$N")>0) {
+        if (namingConvention.indexOf("$N") > 0) {
             return namingConvention.replace("$N", toCamelCase(name));
         }
         return namingConvention.replace("$N", name);
     }
-    
+
     private static String toCamelCase(String a) {
         return new String(new char[]{Character.toUpperCase(a.charAt(0))}) + a.substring(1);
     }
@@ -89,9 +89,9 @@ public class GetterSpec {
         }
 
         public TypeSpec.Builder build() {
-            for (FieldSpec field : typeSpec.fieldSpecs) {
+            typeSpec.fieldSpecs.forEach((field) -> {
                 typeSpecBuilder.addMethod(forField(field, namingConvention).build());
-            }
+            });
             return typeSpecBuilder;
         }
     }

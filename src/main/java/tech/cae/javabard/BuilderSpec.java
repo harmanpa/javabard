@@ -42,8 +42,8 @@ public class BuilderSpec {
         private final TypeSpec typeSpec;
         private String builderClassName = "Builder";
         private Modifier[] buildModifiers = new Modifier[]{Modifier.PUBLIC, Modifier.FINAL};
-        private List<MethodSpec> additionalMethods = new ArrayList<MethodSpec>();
-        private List<FieldSpec> additionalFields = new ArrayList<FieldSpec>();
+        private final List<MethodSpec> additionalMethods = new ArrayList<>();
+        private final List<FieldSpec> additionalFields = new ArrayList<>();
 
         Builder(String packageName, TypeSpec.Builder typeSpecBuilder) {
             this.packageName = packageName;
@@ -66,6 +66,11 @@ public class BuilderSpec {
             return this;
         }
 
+        public Builder withBuilderClassName(String name) {
+            builderClassName = name;
+            return this;
+        }
+
         public TypeName getTargetClassName() {
             return ClassName.get(packageName, typeSpec.name);
         }
@@ -82,7 +87,7 @@ public class BuilderSpec {
             TypeSpec classSpec = typeSpecBuilder.build();
             ClassName builderName = ClassName.get(packageName, classSpec.name, builderClassName);
             StringBuilder constructorStatement = new StringBuilder("return new $N(");
-            List<Object> constructorObjects = new ArrayList<Object>();
+            List<Object> constructorObjects = new ArrayList<>();
             constructorObjects.add(getTargetClassName().toString());
             for (int i = 0; i < classSpec.fieldSpecs.size(); i++) {
                 FieldSpec field = FieldSpec.builder(
@@ -108,17 +113,22 @@ public class BuilderSpec {
                     .addStatement(constructorStatement.toString(), constructorObjects.toArray())
                     .returns(ClassName.get(packageName, classSpec.name))
                     .build());
-            for (MethodSpec additionalMethod : additionalMethods) {
+            additionalMethods.forEach((additionalMethod) -> {
                 builder.addMethod(additionalMethod);
-            }
+            });
             MethodSpec.Builder builderMethod = MethodSpec.methodBuilder("builder")
                     .addModifiers(Modifier.PUBLIC, Modifier.FINAL, Modifier.STATIC)
-                    .returns(builderName).addStatement("$N builder = new $N()", builderClassName, builderClassName);;
-            for (FieldSpec field : additionalFields) {
+                    .returns(builderName)
+                    .addStatement("$N builder = new $N()", builderClassName, builderClassName);
+            additionalFields.stream().map((field) -> {
                 builderMethod.addParameter(field.type, field.name);
+                return field;
+            }).map((field) -> {
                 builder.addField(field);
+                return field;
+            }).forEachOrdered((field) -> {
                 builderMethod.addStatement("builder.$N = $N", field.name, field.name);
-            }
+            });
             builderMethod.addStatement("return builder");
             typeSpecBuilder.addType(builder.build());
             typeSpecBuilder.addMethod(builderMethod.build());
@@ -130,7 +140,7 @@ public class BuilderSpec {
     static MethodSpec builderGetter(FieldSpec field) {
         return MethodSpec.methodBuilder(field.name)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .addJavadoc(field.javadoc)
+                .addJavadoc("Get " + field.javadoc + "\n@return " + field.javadoc + "\n")
                 .returns(field.type)
                 .addStatement("return this.$N", field.name)
                 .build();
@@ -140,7 +150,7 @@ public class BuilderSpec {
         return MethodSpec.methodBuilder(field.name)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .returns(builderName)
-                .addJavadoc(field.javadoc)
+                .addJavadoc("Set " + field.javadoc + "\n@param value " + field.javadoc + "\n@return the Builder object.\n")
                 .addParameter(field.type, "value")
                 .addStatement("this.$N = value", field.name)
                 .addStatement("return this")

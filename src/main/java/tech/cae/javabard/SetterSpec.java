@@ -45,7 +45,7 @@ public class SetterSpec {
      */
     public static MethodSpec.Builder forField(FieldSpec field, String namingConvention, ParameterSpec returnObject) {
         MethodSpec.Builder builder = MethodSpec.methodBuilder(makeName(namingConvention, field.name))
-                .addJavadoc(field.javadoc)
+                .addJavadoc("Set " + field.javadoc + "\n@param $N " + field.javadoc + "\n", field.name)
                 .addParameter(field.type, field.name)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addStatement("this.$N = $N", field.name, field.name);
@@ -102,9 +102,9 @@ public class SetterSpec {
         }
 
         public TypeSpec.Builder build() {
-            for (FieldSpec field : typeSpec.fieldSpecs) {
+            typeSpec.fieldSpecs.forEach((field) -> {
                 typeSpecBuilder.addMethod(forField(field, namingConvention, returnObject).build());
-            }
+            });
             return typeSpecBuilder;
         }
     }
