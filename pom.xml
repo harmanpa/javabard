@@ -13,7 +13,13 @@
         <url>http://cae.tech</url>
     </organization>
     <distributionManagement>
-        <repository>https://maven.pkg.github.com/harmanpa</repository>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>Github</id>
+            <name>Github</name>
+            <url>https://maven.pkg.github.com/harmanpa</url>
+            <layout>default</layout>
+        </repository>
     </distributionManagement>
     <dependencies>
         <dependency>
