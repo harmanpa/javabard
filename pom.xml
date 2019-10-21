@@ -12,7 +12,9 @@
         <name>CAE Tech Limited</name>
         <url>http://cae.tech</url>
     </organization>
-  
+    <distributionManagement>
+        <repository>https://maven.pkg.github.com/harmanpa</repository>
+    </distributionManagement>
     <dependencies>
         <dependency>
             <groupId>com.squareup</groupId>
