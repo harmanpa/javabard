@@ -14,11 +14,9 @@
     </organization>
     <distributionManagement>
         <repository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>Github</id>
-            <name>Github</name>
-            <url>https://maven.pkg.github.com/harmanpa</url>
-            <layout>default</layout>
+            <id>github</id>
+            <name>Github Javabard</name>
+            <url>https://maven.pkg.github.com/harmanpa/javabard</url>
         </repository>
     </distributionManagement>
     <dependencies>
