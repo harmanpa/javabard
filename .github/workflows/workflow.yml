@@ -16,7 +16,7 @@ jobs:
     - name: get current version number
       run: |
            mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -Doutput=.currentVersion
-           mvn org.apache.maven.plugins:maven-dependency-plugin:3.1.1:copy -Dartifact=com.github.siom79.japicmp:japicmp:0.14.3:jar-with-dependencies -DoutputDirectory=.
+           mvn org.apache.maven.plugins:maven-dependency-plugin:3.1.1:copy -Dartifact=com.github.siom79.japicmp:japicmp:0.14.3 -DoutputDirectory=.
     - name: create version number
       run: |
            echo $(echo $GITHUB_SHA | cut -c1-7) > .version           
