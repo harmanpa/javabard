@@ -13,9 +13,13 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+    - name: get current version number
+      run: |
+           mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -Doutput=.currentVersion
+           mvn org.apache.maven.plugins:maven-dependency-plugin:3.1.1:copy -Dartifact=com.github.siom79.japicmp:japicmp:0.14.3:jar-with-dependencies -DoutputDirectory=.
     - name: create version number
       run: |
-           echo $(echo $GITHUB_SHA | cut -c1-7) > .version
+           echo $(echo $GITHUB_SHA | cut -c1-7) > .version           
     - name: Build
       run: mvn clean install
     - name: Set version
