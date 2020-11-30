@@ -15,6 +15,7 @@
  */
 package tech.cae.javabard;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
@@ -44,6 +45,7 @@ public class GetterSpec {
     public static MethodSpec.Builder forField(FieldSpec field, String namingConvention) {
         return MethodSpec.methodBuilder(makeName(namingConvention, field.name))
                 .addJavadoc("Get " + field.javadoc + "\n@return " + field.javadoc + "\n")
+                .addAnnotation(JsonIgnore.class)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .returns(field.type)
                 .addStatement("return this.$N", field.name);

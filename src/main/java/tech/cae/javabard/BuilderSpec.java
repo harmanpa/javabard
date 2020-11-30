@@ -15,6 +15,7 @@
  */
 package tech.cae.javabard;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
@@ -118,6 +119,7 @@ public class BuilderSpec {
             });
             MethodSpec.Builder builderMethod = MethodSpec.methodBuilder("builder")
                     .addModifiers(Modifier.PUBLIC, Modifier.FINAL, Modifier.STATIC)
+                    .addAnnotation(JsonIgnore.class)
                     .returns(builderName)
                     .addStatement("$N builder = new $N()", builderClassName, builderClassName);
             additionalFields.stream().map((field) -> {
@@ -141,6 +143,7 @@ public class BuilderSpec {
         return MethodSpec.methodBuilder(field.name)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addJavadoc("Get " + field.javadoc + "\n@return " + field.javadoc + "\n")
+                .addAnnotation(JsonIgnore.class)
                 .returns(field.type)
                 .addStatement("return this.$N", field.name)
                 .build();
