@@ -43,12 +43,16 @@ public class GetterSpec {
      * @return
      */
     public static MethodSpec.Builder forField(FieldSpec field, String namingConvention) {
-        return MethodSpec.methodBuilder(makeName(namingConvention, field.name))
+        MethodSpec.Builder builder = MethodSpec.methodBuilder(makeName(namingConvention, field.name))
                 .addJavadoc("Get " + field.javadoc + "\n@return " + field.javadoc + "\n")
                 .addAnnotation(JsonIgnore.class)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .returns(field.type)
-                .addStatement("return this.$N", field.name);
+                .addStatement("return $N", field.name);
+        if (field.hasModifier(Modifier.STATIC)) {
+            builder.addModifiers(Modifier.STATIC);
+        }
+        return builder;
     }
 
     private static String makeName(String namingConvention, String name) {

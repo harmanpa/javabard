@@ -45,13 +45,16 @@ public class SetterSpec {
      */
     public static MethodSpec.Builder forField(FieldSpec field, String namingConvention, ParameterSpec returnObject) {
         MethodSpec.Builder builder = MethodSpec.methodBuilder(makeName(namingConvention, field.name))
-                .addJavadoc("Set " + field.javadoc + "\n@param $N " + field.javadoc + "\n", field.name)
-                .addParameter(field.type, field.name)
+                .addJavadoc("Set " + field.javadoc + "\n@param $N_ " + field.javadoc + "\n", field.name)
+                .addParameter(field.type, field.name + "_")
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .addStatement("this.$N = $N", field.name, field.name);
+                .addStatement("$N = $N_", field.name, field.name);
         if (returnObject != null) {
             builder.returns(returnObject.type)
                     .addStatement("return $N", returnObject.name);
+        }
+        if (field.hasModifier(Modifier.STATIC)) {
+            builder.addModifiers(Modifier.STATIC);
         }
         return builder;
     }
