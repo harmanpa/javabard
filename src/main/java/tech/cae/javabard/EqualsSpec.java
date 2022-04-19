@@ -114,9 +114,9 @@ public class EqualsSpec {
 
     private static int randomPrime() {
         Random rand = new Random(); // generate a random number
-        int num = rand.nextInt(30) + 1;
+        int num = rand.nextInt(23) + 1;
         while (!isPrime(num)) {
-            num = rand.nextInt(30) + 1;
+            num = rand.nextInt(23) + 1;
         }
         return num;
     }
