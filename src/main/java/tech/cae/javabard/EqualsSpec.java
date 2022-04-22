@@ -45,7 +45,7 @@ public class EqualsSpec {
             this.typeSpec = this.typeSpecBuilder.build();
         }
 
-        MethodSpec makeHashCode(List<FieldSpec> fields) {
+        MethodSpec makeHashCode(List<FieldSpec> fields, TypeName superclass) {
             MethodSpec.Builder msb = MethodSpec.methodBuilder("hashCode")
                     .returns(TypeName.INT)
                     .addModifiers(Modifier.PUBLIC)
@@ -70,19 +70,22 @@ public class EqualsSpec {
                     }
                 }
             }
+            if (superclass != null && !TypeName.OBJECT.equals(superclass)) {
+                msb.addStatement("hash = $L * hash + super.hashCode()", mult);
+            }
             msb.addStatement("return hash");
             return msb.build();
         }
 
-        MethodSpec makeEquals(List<FieldSpec> fields) {
+        MethodSpec makeEquals(List<FieldSpec> fields, TypeName superclass) {
             MethodSpec.Builder msb = MethodSpec.methodBuilder("equals")
                     .returns(TypeName.BOOLEAN)
                     .addParameter(TypeName.OBJECT, "obj")
                     .addModifiers(Modifier.PUBLIC)
                     .addAnnotation(Override.class);
-            msb.beginControlFlow("if (this==obj)").addStatement("return true").endControlFlow();
-            msb.beginControlFlow("if (obj==null)").addStatement("return false").endControlFlow();
-            msb.beginControlFlow("if (getClass() != obj.getClass())").addStatement("return false").endControlFlow();
+            msb.beginControlFlow("if (this == obj)").addStatement("return true").endControlFlow();
+            msb.beginControlFlow("if (obj == null)").addStatement("return false").endControlFlow();
+            msb.beginControlFlow("if (obj instanceof $N)", typeSpec);
             msb.addStatement("final $N other = ($N)obj", typeSpec, typeSpec);
             for (FieldSpec field : fields) {
                 if (!field.hasModifier(Modifier.STATIC)) {
@@ -97,15 +100,21 @@ public class EqualsSpec {
                     }
                 }
             }
-            msb.addStatement("return true");
+            if (superclass != null && !TypeName.OBJECT.equals(superclass)) {
+                msb.addStatement("return super.equals(obj)");
+            } else {
+                msb.addStatement("return true");
+            }
+            msb.endControlFlow();
+            msb.addStatement("return false");
             return msb.build();
         }
 
         public TypeSpec.Builder build() {
             if (this.typeSpec.kind == Kind.CLASS) {
                 return this.typeSpecBuilder
-                        .addMethod(makeHashCode(this.typeSpec.fieldSpecs))
-                        .addMethod(makeEquals(this.typeSpec.fieldSpecs));
+                        .addMethod(makeHashCode(this.typeSpec.fieldSpecs, this.typeSpec.superclass))
+                        .addMethod(makeEquals(this.typeSpec.fieldSpecs, this.typeSpec.superclass));
             } else {
                 return this.typeSpecBuilder;
             }
