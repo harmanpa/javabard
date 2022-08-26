@@ -58,14 +58,14 @@ public class SetterSpec {
         }
         return builder;
     }
-    
+
     private static String makeName(String namingConvention, String name) {
-        if(namingConvention.indexOf("$N")>0) {
+        if (namingConvention.indexOf("$N") > 0) {
             return namingConvention.replace("$N", toCamelCase(name));
         }
         return namingConvention.replace("$N", name);
     }
-    
+
     private static String toCamelCase(String a) {
         return new String(new char[]{Character.toUpperCase(a.charAt(0))}) + a.substring(1);
     }
@@ -106,7 +106,9 @@ public class SetterSpec {
 
         public TypeSpec.Builder build() {
             typeSpec.fieldSpecs.forEach((field) -> {
-                typeSpecBuilder.addMethod(forField(field, namingConvention, returnObject).build());
+                if (!field.hasModifier(Modifier.FINAL)) {
+                    typeSpecBuilder.addMethod(forField(field, namingConvention, returnObject).build());
+                }
             });
             return typeSpecBuilder;
         }
